@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Markdown from 'react-markdown'
 import markdownit from 'markdown-it';
 import './App.css'
-import './style/styles.css'
 
 function App() {
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
