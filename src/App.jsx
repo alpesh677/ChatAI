@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import Markdown from 'react-markdown'
+import markdownit from 'markdown-it';
 import './App.css'
+import './style/styles.css'
 
 function App() {
   const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -24,10 +27,17 @@ function App() {
       // const prompt = "Write about India"
       const result = await model.generateContent(inputText);
       const text = result.response.text();
-      console.log(text);
+      const md = markdownit()
+      const final_data = md.render(text);
+      console.log(final_data);
+
+      const codeContent = text.match(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/i);
+      const cleanData = codeContent ? codeContent[1] : text;
+
       setLoading(false);
-      setData(text);
-      // setInputText("")
+      setData(cleanData);
+      setInputText("")
+
     } catch (error) {
       setLoading(false);
       console.error("fetchDataFromGeminiAPI error :", error)
@@ -35,8 +45,15 @@ function App() {
   }
   return (
     <>
-      <div className='min-h-[100vh] min-w-full lg:px-16 px-1 flex flex-col gap-2 m-2'>
-        <div className='h-[70vh] min-w-full rounded-lg px-2 py-4 overflow-hidden bg-[#0b0b1d] text-white'>GEMINI AI : {data}</div>
+      <div className='min-h-[100vh] min-w-full lg:px-16 px-1 flex flex-col gap-2 m-2 '>
+        <div className='h-[70vh] min-w-full rounded-lg px-4 py-4 overflow-hidden bg-[#0b0b1d] text-white overflow-y-scroll'>
+          <div className='text-purple-600 mb-5 font-bold text-lg '>GEMINI AI :</div>
+          {loading ? <div className="flex justify-center items-center h-full">
+            <span className="loader"></span>
+          </div> : (<Markdown>{data}</Markdown>)
+          }
+
+        </div>
         <form
           onSubmit={fetchDataFromGeminiAPI}
           className='flex flex-col gap-2 bg-[#0b0b1d] rounded-xl'
